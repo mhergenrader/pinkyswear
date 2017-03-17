@@ -88,23 +88,29 @@ class PinkySwear {
 
   /**
    * 
+   * @param {fulfillmentValue}
    */
-  static resolve(value) {
-    if (value instanceof PinkySwear) {
-      return value; // TODO: what about checks for if the value is rejected?
+  static resolve(fulfillmentValue) {
+    if (fulfillmentValue instanceof PinkySwear) {
+      return fulfillmentValue;
     }
 
     return new PinkySwear((resolve, reject) => {
-      resolve(value);
+      resolve(fulfillmentValue);
     });
   }
 
   /**
    * 
+   * @param {rejectionValue}
    */
-  static reject(errorValue) {
+  static reject(rejectionValue) {
+    if (rejectionValue instanceof PinkySwear) {
+      return rejectionValue;
+    }
+
     return new PinkySwear((resolve, reject) => {
-      reject(errorValue);
+      reject(rejectionValue);
     });
   }
 
