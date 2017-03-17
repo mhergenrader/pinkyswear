@@ -10,6 +10,19 @@ import PinkySwear, {
   PINKY_SWEAR_ERROR_MESSAGES, // TODO: should I really be exporting these, or use the raw strings copied over?
 } from '../src/PinkySwear';
 
+expect.extend({
+  isSameValue(received, argument) { // using SameValueZero algorithm (NaN is itself, 0 !== -0)
+    const pass = Object.is(received, argument);
+    return {
+      pass,
+      message: pass ?
+          () => `Expected ${received} to not be same value as ${argument}`:
+          () => `Expected ${received} to be same value as ${argument}`,
+    };
+  },
+});
+
+
 describe('PinkySwear constructor', () => {
   it('throws an error if the argument is not a function', () => {
     const invalidParameterValues = [
@@ -373,21 +386,19 @@ describe('notifyRejection function', () => {
 });
 
 
-
-
-
 // TODO: what about when you pass in a rejected promise to promise.resolve?
 
 // TODO: should add to the test/another test looking at the internal data
 // fulfilled, and then its value
 describe('PinkySwear static API wrapper methods', () => {
   describe('PinkySwear.resolve method', () => {
-    it('returns a new fulfilled PinkySwear instance for any argument that is ' +
-        'not a PinkySwear instance', () => {
+    it('returns a new fulfilled PinkySwear instance containing any argument ' +
+        'that is not a PinkySwear instance', () => {
       const inputValues = [
         undefined,
         null,
         0,
+        -0,
         1,
         Infinity,
         NaN,
@@ -405,10 +416,34 @@ describe('PinkySwear static API wrapper methods', () => {
         const resultIsPinkySwear = resultValue instanceof PinkySwear;
 
         expect(resultIsPinkySwear).toBeTruthy();
+
+        const pinkySwearResolvedValue =
+            PinkySwearMock.prototype.getResolvedValue.call(resultValue);
+
+        // Using same value check because more appropriate than ===: want to
+        // ensure that whatever value was passed in here is exactly the
+        // wrapped value, fixing the check case of NaN !== NaN from === and 
+        // not treating 0 and -0 the same (to show that the sign of them
+        // has not changed).
+        expect(pinkySwearResolvedValue).isSameValue(inputValue);
+        
+        // Must use explicit this binding, since the static API methods
+        // return an instance of the base class, and these check methods
+        // are defined on the subclass
+        const isPending =
+            PinkySwearMock.prototype.isPending.call(resultValue);
+        const isFulfilled =
+            PinkySwearMock.prototype.isFulfilled.call(resultValue);
+        const isRejected =
+            PinkySwearMock.prototype.isRejected.call(resultValue);
+
+        expect(isPending).not.toBeTruthy();
+        expect(isFulfilled).toBeTruthy();
+        expect(isRejected).not.toBeTruthy();
       });
     });
 
-    it('returns back the same PinkySwear instance', () => {
+    it('returns back the same PinkySwear argument instance', () => {
       const nonPinkySwearValue = 10;
 
       const inputPinkySwear = PinkySwear.resolve(nonPinkySwearValue);

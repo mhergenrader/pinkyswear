@@ -56,7 +56,7 @@ const notifyRejection = function(rejectionValue) {
   if (this.resolvedStatus != PINKY_SWEAR_STATUSES.PENDING) {
     return;
   }
-  
+
   this.resolvedStatus = PINKY_SWEAR_STATUSES.REJECTED;
   this.resolvedValue = rejectionValue;
 
@@ -120,6 +120,10 @@ class PinkySwear {
 
 }
 
+// TODO: make this a superclass instead?
+// but we don't want to modify the inheritance tree of the (base) class
+// under test here...
+
 /**
  * Mock subclass that allows getting access to parent state without parent
  * needing to provide these getter methods
@@ -139,16 +143,20 @@ export class PinkySwearMock extends PinkySwear {
     return this.resolvedStatus;
   }  
 
+  // Need to refer to this explicitly, since we may be calling these
   isPending() {
-    return this.getResolvedStatus() === PINKY_SWEAR_STATUSES.PENDING;
+    return PinkySwearMock.prototype.getResolvedStatus.call(this) ===
+        PINKY_SWEAR_STATUSES.PENDING;
   }
 
   isFulfilled() {
-    return this.getResolvedStatus() === PINKY_SWEAR_STATUSES.FULFILLED;
+    return PinkySwearMock.prototype.getResolvedStatus.call(this) ===
+        PINKY_SWEAR_STATUSES.FULFILLED;
   }
 
   isRejected() {
-  return this.getResolvedStatus() === PINKY_SWEAR_STATUSES.REJECTED;
+    return PinkySwearMock.prototype.getResolvedStatus.call(this) ===
+        PINKY_SWEAR_STATUSES.REJECTED;
   }
 
   getResolvedValue() {
