@@ -1,0 +1,31 @@
+{
+  "name": "pinkyswear",
+  "version": "1.0.0",
+  "description": "Basic implementation in TypeScript of a Promise object, aliased as PinkySwear to avoid conflicts.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --watchAll"
+  },
+  "author": "Mike Hergenrader (mike.hergenrader@gmail.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mhergenrader/pinkyswear.git"
+  },
+  "keywords": [
+    "typescript",
+    "jest",
+    "promises"
+  ],
+  "devDependencies": {
+    "babel-jest": "^19.0.0",
+    "babel-plugin-transform-class-properties": "^6.23.0",
+    "babel-preset-env": "^1.2.2",
+    "jest": "^19.0.2"
+  },
+  "jest": {
+    "transform": {
+      ".*": "<rootDir>/node_modules/babel-jest"
+    }
+  }
+}
